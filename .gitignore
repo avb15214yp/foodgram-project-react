@@ -132,3 +132,4 @@ dmypy.json
 .idea
 venv_17_final/
 data/
+.vscode
