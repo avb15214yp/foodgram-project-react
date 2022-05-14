@@ -2,6 +2,7 @@ import os
 
 from pathlib import Path
 from dotenv import load_dotenv
+from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,8 +21,13 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'users.apps.UsersConfig',
+    'django.contrib.staticfiles',    
+    'rest_framework',
+    'rest_framework.authtoken',
+    'djoser',
+    'api.apps.ApiConfig',
+    'users.apps.UsersConfig',    
+
 ]
 
 MIDDLEWARE = [
@@ -66,7 +72,6 @@ DATABASES = {
 }
 
 
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -82,11 +87,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# PASSWORD_HASHERS = [
+#     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+#     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+#     'django.contrib.auth.hashers.Argon2PasswordHasher',
+#     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+#     'django.contrib.auth.hashers.ScryptPasswordHasher',
+# ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.0/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'UTC'
 
@@ -94,13 +103,40 @@ USE_I18N = True
 
 USE_TZ = True
 
+STATIC_URL = '/static/'
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.0/howto/static-files/
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATIC_URL = 'static/'
-
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'users.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly', 
+    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': os.getenv('PAGE_SIZE', default="10"),
+}
+
+SIMPLE_JWT = {
+   'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+   'AUTH_HEADER_TYPES': ('Token',),
+} 
+
+DJOSER = {
+    'PERMISSIONS' : {
+        'activation': ['rest_framework.permissions.IsAdminUser'],
+        'user_list': ['rest_framework.permissions.IsAdminUser'],
+    },
+    'HIDE_USERS' : True,
+    'LOGIN_FIELD' : 'email',
+}
