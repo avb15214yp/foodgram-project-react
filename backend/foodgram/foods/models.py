@@ -46,11 +46,10 @@ class Tag(models.Model):
         blank=False, null=False, unique=True
     )
     color = models.CharField(
-        _("цвет"), max_length=7, 
+        _("цвет"), max_length=7,
         blank=True, null=True
     )
     slug = models.SlugField(max_length=200, unique=True, blank=True, null=True)
-
 
     class Meta:
         ordering = ['name', ]
