@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.hashers import make_password, check_password
 
-from users.models import User
+from users.models import User, Follow
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ('id', 'username', 'email', 'first_name', 'last_name')
@@ -17,3 +17,4 @@ class UserAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 admin.site.register(User, UserAdmin)
+admin.site.register(Follow)

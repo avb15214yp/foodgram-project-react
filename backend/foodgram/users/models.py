@@ -61,4 +61,24 @@ class User(AbstractUser):
     @property
     def is_admin(self):
         return self.role == ROLES[1][0]
-       
+
+class Follow(models.Model):
+    #Кто подписался
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='follower'
+    )
+    #На кого подписался
+    following = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='following'
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'following'],
+                name='unique_user_following'
+            )
+        ]
+
+    def __str__(self):
+        return self.user.username + '->' + self.following.username       
