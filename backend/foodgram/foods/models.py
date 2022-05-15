@@ -38,3 +38,24 @@ class Ingredient(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Tag(models.Model):
+    name = models.CharField(
+        _('name'), max_length=200,
+        blank=False, null=False, unique=True
+    )
+    color = models.CharField(
+        _("цвет"), max_length=7, 
+        blank=True, null=True
+    )
+    slug = models.SlugField(max_length=200, unique=True, blank=True, null=True)
+
+
+    class Meta:
+        ordering = ['name', ]
+        verbose_name = _('тег')
+        verbose_name_plural = _('теги')
+
+    def __str__(self):
+        return self.name
