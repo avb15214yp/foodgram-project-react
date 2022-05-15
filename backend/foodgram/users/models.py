@@ -10,6 +10,7 @@ ROLES = [
     (ROLE_ADMIN, 'Администратор')
 ]
 
+
 class CustomUserManager(UserManager):
 
     def create_user(self, username, email, password,  **extra_fields):
@@ -29,6 +30,7 @@ class CustomUserManager(UserManager):
         return super().create_superuser(
             username, email, password, role=role, **extra_fields)
 
+
 class User(AbstractUser):
 
     email = models.EmailField(_("email address"), unique=True, db_index=True)
@@ -37,37 +39,34 @@ class User(AbstractUser):
 
     role = models.CharField(
         choices=ROLES,
-        default = ROLE_USER,
+        default=ROLE_USER,
         blank=False,
         null=False,
         max_length=200,
         verbose_name='Роль',
     )
-    
+
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name', 'password']
     USERNAME_FIELD = 'username'
-    
-    # objects = CustomUserManager()    
 
     class Meta:
         ordering = ('username',)
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-        
 
     def __str__(self):
-            return self.username
+        return self.username
 
     @property
     def is_admin(self):
         return self.role == ROLES[1][0]
 
+
 class Follow(models.Model):
-    #Кто подписался
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='follower'
     )
-    #На кого подписался
+
     following = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='following'
     )
@@ -81,4 +80,4 @@ class Follow(models.Model):
         ]
 
     def __str__(self):
-        return self.user.username + '->' + self.following.username       
+        return self.user.username + '->' + self.following.username

@@ -10,12 +10,13 @@ from users.permissions import UserListCreatePermission
 
 User = get_user_model()
 
-class UserListCreateViewSet(ListCreateViewSet):    
+
+class UserListCreateViewSet(ListCreateViewSet):
     queryset = User.objects.all()
     permission_classes = (UserListCreatePermission,)
 
     def get_serializer_class(self):
-        if self.action == 'create':            
+        if self.action == 'create':
             return UserSerializerCreate
         elif self.action == 'set_password':
             return SetPasswordSerializer
@@ -24,7 +25,7 @@ class UserListCreateViewSet(ListCreateViewSet):
     def get_instance(self):
         return self.request.user
 
-    @action(["get",], detail=False)
+    @action(["get", ], detail=False)
     def me(self, request, *args, **kwargs):
         self.get_object = self.get_instance
         return self.retrieve(request, *args, **kwargs)
