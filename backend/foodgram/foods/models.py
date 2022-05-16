@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
@@ -58,3 +59,77 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Recipe(models.Model):
+
+    ingredients = models.ManyToManyField(
+        Ingredient,
+        through='RecipeIngredient'
+    )
+
+    tags = models.ManyToManyField(Tag)
+
+    user_faworites = models.ManyToManyField(
+        User, related_name='recipe_faworites'
+    )
+
+    shopping_cart = models.ManyToManyField(
+        User, related_name='recipe_shopping'
+    )
+
+    image = models.FileField(
+        _('Картинка'), upload_to='recipes/',
+        blank=False
+        )
+
+    name = models.CharField(
+        _('name'), max_length=200,
+        blank=False, null=False, unique=True
+    )
+
+    text = models.TextField(
+        _('Описание'),
+        blank=False, null=False,
+    )
+
+    cooking_time = models.IntegerField(
+        _('Время приготовления (в минутах)'),
+        validators=[MinValueValidator(1)],
+        blank=False, null=False
+    )
+
+    author = models.ForeignKey(
+        User, on_delete=models.PROTECT,
+        blank=False, null=False,
+        verbose_name='Автор', related_name='recipe_author'
+    )
+
+    created = models.DateTimeField('created', auto_now_add=True)
+    updated = models.DateTimeField('updated', auto_now=True)
+
+    class Meta:
+        ordering = ['-updated', ]
+
+
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE,
+        blank=False, null=False
+    )
+    ingredient = models.ForeignKey(
+        Ingredient, on_delete=models.CASCADE,
+        blank=False, null=False
+    )
+    amount = models.IntegerField(
+        _('Количество'), validators=[MinValueValidator(1)],
+        blank=False, null=False
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name='unique_recipe_ingredient'
+            )
+        ]
