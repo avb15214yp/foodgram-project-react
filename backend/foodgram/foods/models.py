@@ -65,17 +65,20 @@ class Recipe(models.Model):
 
     ingredients = models.ManyToManyField(
         Ingredient,
-        through='RecipeIngredient'
+        through='RecipeIngredient',
+        verbose_name='ингредиенты',
     )
 
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag, verbose_name='Тэг')
 
     user_faworites = models.ManyToManyField(
-        User, related_name='recipe_faworites'
+        User, related_name='recipe_faworites',
+        verbose_name='фаворит у пользователей',
     )
 
     shopping_cart = models.ManyToManyField(
-        User, related_name='recipe_shopping'
+        User, related_name='recipe_shopping',
+        verbose_name='в карте покупок у пользователей',
     )
 
     image = models.FileField(
@@ -110,6 +113,8 @@ class Recipe(models.Model):
 
     class Meta:
         ordering = ['-updated', ]
+        verbose_name = 'рецепт'
+        verbose_name_plural = 'рецепты'
 
 
 class RecipeIngredient(models.Model):
