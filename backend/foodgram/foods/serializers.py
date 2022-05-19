@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from foods.models import Ingredient, Unit, Tag, Recipe
+from foods.models import Ingredient, Unit, Tag, Recipe, RecipeIngredient
 from users.serializers import UserSerializerList
 
 
@@ -36,10 +36,7 @@ class IngredientSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class RecipeIngredientSerializer(IngredientSerializer):
-    amount = serializers.IntegerField(source='ingredients_amount')
-
-    class Meta:
-        model = Recipe
+    pass
 
 
 class TagSerializer(serializers.HyperlinkedModelSerializer):
@@ -52,7 +49,7 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
 class RecipeSerializer(BaseHyperlinkedModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializerList()
-    ingredients = RecipeIngredientSerializer(many=True)
+    ingredients = RecipeIngredientSerializer()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -64,6 +61,7 @@ class RecipeSerializer(BaseHyperlinkedModelSerializer):
             'name', 'image', 'text',
             'cooking_time'
         ]
+        # depth = 1
 
     def get_is_favorited(self, obj):
         user = self.get_authenticated_user()
