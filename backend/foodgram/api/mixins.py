@@ -11,6 +11,14 @@ class ListCreateViewSet(mixins.CreateModelMixin, mixins.ListModelMixin,
     pagination_class = LimitOffsetPagination
 
 
+class ListCreateUpdateViewSet(
+                        mixins.CreateModelMixin, mixins.ListModelMixin,
+                        mixins.RetrieveModelMixin, viewsets.GenericViewSet,
+                        mixins.UpdateModelMixin, mixins.DestroyModelMixin
+        ):
+    pagination_class = LimitOffsetPagination
+
+
 class ListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
     pagination_class = LimitOffsetPagination

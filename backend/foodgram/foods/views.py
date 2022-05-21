@@ -1,7 +1,7 @@
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 
-from api.mixins import ListViewSet, ListCreateViewSet
+from api.mixins import ListViewSet, ListCreateUpdateViewSet
 from foods.models import Ingredient, Tag, Recipe
 from foods.serializers import IngredientSerializer, TagSerializer
 from foods.serializers import RecipeSerializer
@@ -25,7 +25,7 @@ class TagListViewSet(ListViewSet):
     pagination_class = None
 
 
-class RecipeListCreateViewSet(ListCreateViewSet):
+class RecipeListCreateViewSet(ListCreateUpdateViewSet):
     permission_classes = (C_AuthUser_UD_Owner_R_Any_Permisson,)
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer

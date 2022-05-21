@@ -14,4 +14,4 @@ class C_AuthUser_UD_Owner_R_Any_Permisson(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        return obj.get(self.field_owner_name) == request.user
+        return getattr(obj, self.field_owner_name) == request.user

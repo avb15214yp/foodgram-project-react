@@ -81,7 +81,7 @@ class Recipe(models.Model):
         verbose_name='в карте покупок у пользователей',
     )
 
-    image = models.FileField(
+    image = models.ImageField(
         _('Картинка'), upload_to='recipes/',
         blank=False
         )
