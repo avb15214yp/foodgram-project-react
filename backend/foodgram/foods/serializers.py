@@ -90,6 +90,14 @@ class ImageFieldSerializer(serializers.ImageField):
         return extension
 
 
+class RecipeSerializerForFavorite(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = [
+            'id', 'name', 'image', 'cooking_time'
+        ]
+
+
 class RecipeSerializer(BaseModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializerList(read_only=True)

@@ -5,14 +5,6 @@ from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
 
-class BaseModel(models.Model):
-
-    class Meta:
-        abstract = True
-
-
-
-
 
 class Unit(models.Model):
     name = models.CharField(
