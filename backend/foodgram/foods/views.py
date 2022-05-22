@@ -1,5 +1,9 @@
 from rest_framework import permissions
+from rest_framework.decorators import action
+from django.core.exceptions import BadRequest
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
+from rest_framework.response import Response
 
 from api.mixins import ListViewSet, ListCreateUpdateViewSet
 from foods.models import Ingredient, Tag, Recipe
@@ -31,3 +35,14 @@ class RecipeListCreateViewSet(ListCreateUpdateViewSet):
     serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
+
+    @action(methods=['post'], detail=True)
+    def favorite(self, request, pk=None):
+        try:
+            recipe = Recipe.objects.get(pk=pk)
+        except Exception:
+            return Response(status=status.HTTP_204_NO_CONTENT, data='dssss')
+            # raise BadRequest(f'Не найден рецепт с id={pk}')
+
+        recipe.user_faworites.add(recipe)
+        return recipe
