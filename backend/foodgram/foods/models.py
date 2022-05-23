@@ -74,11 +74,13 @@ class Recipe(models.Model):
     user_faworites = models.ManyToManyField(
         User, related_name='recipe_faworites',
         verbose_name='фаворит у пользователей',
+        blank=True, null=True
     )
 
     shopping_cart = models.ManyToManyField(
         User, related_name='recipe_shopping',
         verbose_name='в карте покупок у пользователей',
+        blank=True, null=True
     )
 
     image = models.ImageField(

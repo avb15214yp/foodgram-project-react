@@ -99,6 +99,14 @@ class RecipeSerializerForFavorite(serializers.ModelSerializer):
         ]
 
 
+class RecipeShortSerializer(BaseModelSerializer):
+    image = ImageFieldSerializer(max_length=None, use_url=True)
+
+    class Meta:
+        model = Recipe
+        fields = ['id', 'name', 'image', 'cooking_time']
+
+
 class RecipeSerializer(BaseModelSerializer):
     tags = TagSerializer(many=True)
     author = UserSerializerList(read_only=True)
@@ -184,15 +192,37 @@ class RecipeSerializer(BaseModelSerializer):
         return instance
 
 
-class SubscriptionSerializer(serializers.ModelSerializer):
-    # email = serializers.EmailField(source='user.email')
-    # id = serializers.IntegerField(source='user.')
-    # username = serializers.(source='user.')
-    # first_name = serializers.(source='user.')
-    # last_name = serializers.(source='user.')
-    # = serializers.(source='user.')
-    user = UserSerializerList(read_only=True)
-
+class SubscriptionSerializer(UserSerializerList):
     class Meta:
         model = Follow
-        fields = ['user', ]# ['email', 'user', 'following']
+        fields = '__all__'
+        read_only_fields = ['user', 'following']
+
+    def to_representation(self, value):
+        request = self.context['request']
+        recipes_limit = request.query_params.get('recipes_limit')
+        context = {'context': self.context}
+        ret = UserSerializerList(
+            value.following, **context
+        ).data
+        author_id = ret['id']
+        if recipes_limit:
+            recipe_set = Recipe.objects.filter(
+                author__id=author_id
+            )[:int(recipes_limit)]
+        else:
+            recipe_set = Recipe.objects.filter(author__id=author_id)
+        recipes = [
+         RecipeShortSerializer(recipe, **context).data for recipe in recipe_set
+        ]
+        ret.update({'recipes': recipes})
+        return ret
+
+    def create(self, validated_data):
+        tags = validated_data.pop('tags')
+        recipe_ingredients = validated_data.pop('recipe_ingredient')
+        author = self.context['request'].user
+        recipe = Recipe.objects.create(author=author, **validated_data)
+        self.recipe_add_tags(recipe, tags)
+        self.recipe_add_ingredients(recipe, recipe_ingredients)
+        return recipe

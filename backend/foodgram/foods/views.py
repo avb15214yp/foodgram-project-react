@@ -1,4 +1,6 @@
 from django.http import JsonResponse
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.decorators import action
@@ -16,6 +18,9 @@ from foods.permissions import C_AuthUser_DL_Owner_Permisson
 
 from foods.shortcuts import get_object_or_response400
 from users.models import Follow
+
+
+User = get_user_model()
 
 
 class IngredientViewSet(ListViewSet):
@@ -77,5 +82,47 @@ class SubscriptionViewSet(ListCreateDelViewSet):
         user = self.request.user
         return Follow.objects.filter(user=user)
 
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
+    def create(self, request, id):
+
+        following_id = id
+        user = request.user
+        if user.id == following_id:
+            error_msg = {'errors': 'Нельзя подписываться на самого себя'}
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST, data=error_msg
+            )
+
+        following_exists = user.follower.filter(
+            following__id=following_id
+        ).exists()
+        if following_exists:
+            error_msg = {'errors': 'Уже есть подписка на этого автора'}
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST, data=error_msg
+            )
+
+        following = get_object_or_404(User, pk=following_id)
+        follow = Follow.objects.create(user=user, following=following)
+        context = {'context': {'request': request}}
+        data = SubscriptionSerializer(instance=follow, **context).data
+        return JsonResponse(data=data, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, id):
+        following_id = id
+        user = request.user
+        if user.id == following_id:
+            error_msg = {'errors': 'Нельзя отписаться от самого себя'}
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST, data=error_msg
+            )
+        following = get_object_or_404(User, pk=following_id)
+
+        follow = user.follower.filter(following=following)
+        if not follow.exists():
+            error_msg = {'errors': 'Нет подписки на этого автора'}
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST, data=error_msg
+            )
+
+        follow.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
