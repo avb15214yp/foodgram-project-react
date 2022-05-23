@@ -5,16 +5,20 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 
-from api.mixins import ListViewSet, ListCreateUpdateViewSet
+from api.mixins import ListViewSet, ListAllViewSet, ListCreateDelViewSet
 from foods.models import Ingredient, Tag, Recipe
 from foods.serializers import IngredientSerializer, TagSerializer
 from foods.serializers import RecipeSerializer, RecipeSerializerForFavorite
+from foods.serializers import SubscriptionSerializer
 from foods.filters import IngredientFilter, RecipeFilter
 from foods.permissions import C_AuthUser_UD_Owner_R_Any_Permisson
+from foods.permissions import C_AuthUser_DL_Owner_Permisson
+
 from foods.shortcuts import get_object_or_response400
+from users.models import Follow
 
 
-class IngredientListViewSet(ListViewSet):
+class IngredientViewSet(ListViewSet):
     permission_classes = (permissions.AllowAny,)
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
@@ -23,14 +27,14 @@ class IngredientListViewSet(ListViewSet):
     filterset_class = IngredientFilter
 
 
-class TagListViewSet(ListViewSet):
+class TagViewSet(ListViewSet):
     permission_classes = (permissions.AllowAny,)
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     pagination_class = None
 
 
-class RecipeListCreateViewSet(ListCreateUpdateViewSet):
+class RecipeViewSet(ListAllViewSet):
     permission_classes = (C_AuthUser_UD_Owner_R_Any_Permisson,)
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
@@ -62,3 +66,16 @@ class RecipeListCreateViewSet(ListCreateUpdateViewSet):
 
         error_msg = {'errors': 'Этого рецепта нет в избранных'}
         return Response(status=status.HTTP_400_BAD_REQUEST, data=error_msg)
+
+
+class SubscriptionViewSet(ListCreateDelViewSet):
+    permission_classes = (C_AuthUser_DL_Owner_Permisson,)
+    # queryset = Follow.objects.all()
+    serializer_class = SubscriptionSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return Follow.objects.filter(user=user)
+
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)

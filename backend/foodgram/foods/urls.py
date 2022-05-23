@@ -1,17 +1,17 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from foods.views import IngredientListViewSet, TagListViewSet
-from foods.views import RecipeListCreateViewSet
+from foods.views import IngredientViewSet, TagViewSet
+from foods.views import RecipeViewSet
 
 router_ingredient = routers.DefaultRouter()
-router_ingredient.register(r'', IngredientListViewSet, basename='ingredient')
+router_ingredient.register(r'', IngredientViewSet, basename='ingredient')
 
 router_tag = routers.DefaultRouter()
-router_tag.register(r'', TagListViewSet, basename='tag')
+router_tag.register(r'', TagViewSet, basename='tag')
 
 router_recipe = routers.DefaultRouter()
-router_recipe.register(r'', RecipeListCreateViewSet, basename='recipe')
+router_recipe.register(r'', RecipeViewSet, basename='recipe')
 
 
 urlpatterns = [

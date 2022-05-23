@@ -2,6 +2,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from foods.models import Ingredient, Unit, Tag, Recipe, RecipeIngredient
+from users.models import Follow
 from users.serializers import UserSerializerList
 
 
@@ -181,3 +182,17 @@ class RecipeSerializer(BaseModelSerializer):
         )
         instance.save()
         return instance
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    # email = serializers.EmailField(source='user.email')
+    # id = serializers.IntegerField(source='user.')
+    # username = serializers.(source='user.')
+    # first_name = serializers.(source='user.')
+    # last_name = serializers.(source='user.')
+    # = serializers.(source='user.')
+    user = UserSerializerList(read_only=True)
+
+    class Meta:
+        model = Follow
+        fields = ['user', ]# ['email', 'user', 'following']
