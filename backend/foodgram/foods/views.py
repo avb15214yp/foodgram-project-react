@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions
@@ -62,7 +62,8 @@ class RecipeViewSet(ListAllViewSet):
                 )
 
             recipe.user_faworites.add(user)
-            data = RecipeSerializerForFavorite(instance=recipe).data
+            context = {'context': {'request': request}}
+            data = RecipeSerializerForFavorite(instance=recipe, **context).data
             return JsonResponse(data=data, status=status.HTTP_201_CREATED)
 
         if user_exists:
@@ -71,6 +72,61 @@ class RecipeViewSet(ListAllViewSet):
 
         error_msg = {'errors': 'Этого рецепта нет в избранных'}
         return Response(status=status.HTTP_400_BAD_REQUEST, data=error_msg)
+
+    @action(methods=['post', 'delete'], detail=True)
+    def shopping_cart(self, request, pk=None):
+        get_status, res = get_object_or_response400(Recipe, pk=pk)
+        if not get_status:
+            return res
+        recipe = res
+        user = request.user
+        recipe_shopping_exists = user.recipe_shopping.filter(id=recipe.id).exists()
+        if request.method == 'POST':
+            if recipe_shopping_exists:
+                error_msg = {'errors': 'Этот рецепт уже добавлен в покупки'}
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST, data=error_msg
+                )
+
+            recipe.shopping_cart.add(user)
+            context = {'context': {'request': request}}
+            data = RecipeSerializerForFavorite(instance=recipe, **context).data
+            return JsonResponse(data=data, status=status.HTTP_201_CREATED)
+
+        if recipe_shopping_exists:
+            recipe.shopping_cart.remove(user)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        error_msg = {'errors': 'Этого рецепта нет в списке покупок'}
+        return Response(status=status.HTTP_400_BAD_REQUEST, data=error_msg)
+
+    @action(methods=['get',], detail=False)
+    def download_shopping_cart(self, request):
+        user = request.user
+        shopping_list = {}
+        for recipe in user.recipe_shopping.all():
+            for recipe_ingredietn in recipe.recipe_ingredient.all():
+                ingredient = recipe_ingredietn.ingredient
+                amount = recipe_ingredietn.amount
+                if ingredient in shopping_list:
+                    shopping_list[ingredient] += amount
+                else:
+                    shopping_list[ingredient] = amount
+        
+        shopping = 'Список покупок' + '\n'
+        for key, value in shopping_list.items():
+            shopping = shopping + str(key) + ' ' + str(value) + str(key.measurement_unit) +  '\n'
+
+
+        filename = "shopping_list.txt"
+        content = shopping
+        response = HttpResponse(content, content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+        return response
+        # return Response(status=status.HTTP_400_BAD_REQUEST, data=shopping_list)
+
+
+
 
 
 class SubscriptionViewSet(ListCreateDelViewSet):
