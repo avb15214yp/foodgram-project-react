@@ -1,7 +1,7 @@
 from django.db import transaction
 from rest_framework import serializers
 
-from foods.models import Ingredient, Unit, Tag, Recipe, RecipeIngredient
+from foods.models import Ingredient, Recipe, RecipeIngredient, Tag, Unit
 from users.models import Follow
 from users.serializers import UserSerializerList
 
@@ -64,13 +64,14 @@ class TagSerializer(serializers.ModelSerializer):
 class ImageFieldSerializer(serializers.ImageField):
 
     def to_representation(self, value):
-        return self.context['request'].build_absolute_uri(value.url)
+        return value.url
 
     def to_internal_value(self, data):
-        from django.core.files.base import ContentFile
         import base64
-        import six
         import uuid
+
+        import six
+        from django.core.files.base import ContentFile
         if isinstance(data, six.string_types):
             if 'data:' in data and ';base64,' in data:
                 header, data = data.split(';base64,')

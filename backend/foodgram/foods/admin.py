@@ -1,8 +1,6 @@
 from django.contrib import admin
 
-from foods.models import Ingredient, Unit
-from foods.models import Tag, Recipe
-from foods.models import RecipeIngredient
+from foods.models import Ingredient, Recipe, RecipeIngredient, Tag, Unit
 
 
 class IngredientAdmin(admin.ModelAdmin):
@@ -15,9 +13,12 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author')
-    search_fields = ('author', 'name')
+    list_display = ('id', 'name', 'author', 'user_faworites_count')
+    search_fields = ('author__username', 'name')
     list_filter = ('tags',)
+
+    def user_faworites_count(self, obj):
+        return obj.user_faworites.count()
 
 
 class RecipeIngredientAdmin(admin.ModelAdmin):

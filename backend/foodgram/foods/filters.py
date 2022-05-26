@@ -1,5 +1,4 @@
 from django_filters import rest_framework as filters
-# from django_filters import ChoiceFilter
 
 from foods.models import Ingredient, Recipe, Tag
 

@@ -1,12 +1,12 @@
 from django.contrib.auth import get_user_model
+from djoser.serializers import SetPasswordSerializer
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from djoser.serializers import SetPasswordSerializer
 
 from api.mixins import ListCreateViewSet
-from users.serializers import UserSerializerList, UserSerializerCreate
 from users.permissions import UserListCreatePermission
+from users.serializers import UserSerializerCreate, UserSerializerList
 
 User = get_user_model()
 

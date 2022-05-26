@@ -1,6 +1,7 @@
 from django.urls import include, path
-from users.views import UserListCreateViewSet
 from rest_framework import routers
+
+from users.views import UserListCreateViewSet
 
 router = routers.DefaultRouter()
 router.register(r'', UserListCreateViewSet)

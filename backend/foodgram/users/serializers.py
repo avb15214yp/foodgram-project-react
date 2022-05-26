@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from djoser.serializers import UserCreateSerializer as djUserCreateSerializer
 from rest_framework import serializers
 
 User = get_user_model()
@@ -24,8 +25,10 @@ class UserSerializerList(serializers.HyperlinkedModelSerializer):
         return obj.following.filter(user=user).exists()
 
 
-class UserSerializerCreate(serializers.HyperlinkedModelSerializer):
+class UserSerializerCreate(djUserCreateSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'id', 'username', 'first_name', 'last_name']
+        fields = [
+            'email', 'id', 'username', 'first_name', 'last_name', 'password'
+        ]

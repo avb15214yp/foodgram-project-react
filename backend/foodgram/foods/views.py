@@ -1,24 +1,21 @@
-from django.http import JsonResponse, HttpResponse
 from django.contrib.auth import get_user_model
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions
-from rest_framework import status
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
 
-from api.mixins import ListViewSet, ListAllViewSet, ListCreateDelViewSet
-from foods.models import Ingredient, Tag, Recipe
-from foods.serializers import IngredientSerializer, TagSerializer
-from foods.serializers import RecipeSerializer, RecipeSerializerForFavorite
-from foods.serializers import SubscriptionSerializer
+from api.mixins import ListAllViewSet, ListCreateDelViewSet, ListViewSet
 from foods.filters import IngredientFilter, RecipeFilter
-from foods.permissions import C_AuthUser_UD_Owner_R_Any_Permisson
-from foods.permissions import C_AuthUser_DL_Owner_Permisson
-
+from foods.models import Ingredient, Recipe, Tag
+from foods.permissions import (C_AuthUser_DL_Owner_Permisson,
+                               C_AuthUser_UD_Owner_R_Any_Permisson)
+from foods.serializers import (IngredientSerializer, RecipeSerializer,
+                               RecipeSerializerForFavorite,
+                               SubscriptionSerializer, TagSerializer)
 from foods.shortcuts import get_object_or_response400
 from users.models import Follow
-
 
 User = get_user_model()
 
@@ -80,7 +77,8 @@ class RecipeViewSet(ListAllViewSet):
             return res
         recipe = res
         user = request.user
-        recipe_shopping_exists = user.recipe_shopping.filter(id=recipe.id).exists()
+        recipe_shopping_exists = user.recipe_shopping.filter(
+            id=recipe.id).exists()
         if request.method == 'POST':
             if recipe_shopping_exists:
                 error_msg = {'errors': 'Этот рецепт уже добавлен в покупки'}
@@ -100,7 +98,7 @@ class RecipeViewSet(ListAllViewSet):
         error_msg = {'errors': 'Этого рецепта нет в списке покупок'}
         return Response(status=status.HTTP_400_BAD_REQUEST, data=error_msg)
 
-    @action(methods=['get',], detail=False)
+    @action(methods=['get', ], detail=False)
     def download_shopping_cart(self, request):
         user = request.user
         shopping_list = {}
@@ -112,21 +110,19 @@ class RecipeViewSet(ListAllViewSet):
                     shopping_list[ingredient] += amount
                 else:
                     shopping_list[ingredient] = amount
-        
+
         shopping = 'Список покупок' + '\n'
         for key, value in shopping_list.items():
-            shopping = shopping + str(key) + ' ' + str(value) + str(key.measurement_unit) +  '\n'
-
+            shopping = shopping + str(key) + ' ' + str(value) + str(
+                key.measurement_unit) + '\n'
 
         filename = "shopping_list.txt"
         content = shopping
         response = HttpResponse(content, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+        response[
+            'Content-Disposition'
+        ] = 'attachment; filename={0}'.format(filename)
         return response
-        # return Response(status=status.HTTP_400_BAD_REQUEST, data=shopping_list)
-
-
-
 
 
 class SubscriptionViewSet(ListCreateDelViewSet):

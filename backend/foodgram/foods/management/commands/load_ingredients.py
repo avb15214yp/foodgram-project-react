@@ -1,7 +1,8 @@
 import csv
+
 from django.core.management.base import BaseCommand
 
-from foods.models import Unit, Ingredient
+from foods.models import Ingredient, Unit
 
 
 class Command(BaseCommand):
@@ -9,7 +10,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'file_name', type=str, 
+            'file_name', type=str,
             help=u'Имя файла для загрузки'
         )
 
@@ -21,7 +22,7 @@ class Command(BaseCommand):
             for row in reader:
                 unit_name = row[1]
                 unit, status = Unit.objects.get_or_create(name=unit_name)
-                ingredient = Ingredient.objects.filter(name=row[0])                
+                ingredient = Ingredient.objects.filter(name=row[0])
                 if not ingredient:
                     Ingredient.objects.create(
                         name=row[0],

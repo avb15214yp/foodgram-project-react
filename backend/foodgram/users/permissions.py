@@ -8,4 +8,6 @@ class UserListCreatePermission(permissions.BasePermission):
         return bool(request.user and request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
+        if view.action in ('retrieve',):
+            return bool(request.user and request.user.is_authenticated)
         return obj == request.user
