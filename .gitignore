@@ -134,3 +134,4 @@ venv_17_final/
 data/
 media/
 .vscode
+backend/foodgram/media/.

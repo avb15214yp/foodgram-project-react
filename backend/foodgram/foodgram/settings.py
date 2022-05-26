@@ -10,7 +10,7 @@ load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='django-insecure-expwsgh^8rnl)lms7osg*&bs_1qwpzo$l)b&cqj=1edl#rpp&r')
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',    
     'rest_framework',
+    'corsheaders',
     'django_filters',
     'rest_framework.authtoken',
     'djoser',
@@ -35,6 +36,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -92,13 +94,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# PASSWORD_HASHERS = [
-#     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-#     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-#     'django.contrib.auth.hashers.Argon2PasswordHasher',
-#     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
-#     'django.contrib.auth.hashers.ScryptPasswordHasher',
-# ]
 
 LANGUAGE_CODE = 'ru-ru'
 
@@ -145,3 +140,6 @@ DJOSER = {
     'HIDE_USERS' : True,
     'LOGIN_FIELD' : 'email',
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
+# CORS_URLS_REGEX = r'^/.*$'
