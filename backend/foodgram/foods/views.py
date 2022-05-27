@@ -6,8 +6,8 @@ from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.mixins import ListAllViewSet, ListCreateDelViewSet, ListViewSet
 from foods.filters import IngredientFilter, RecipeFilter
+from foods.mixins import ListAllViewSet, ListCreateDelViewSet, ListViewSet
 from foods.models import Ingredient, Recipe, Tag
 from foods.permissions import (C_AuthUser_DL_Owner_Permisson,
                                C_AuthUser_UD_Owner_R_Any_Permisson)
@@ -127,7 +127,6 @@ class RecipeViewSet(ListAllViewSet):
 
 class SubscriptionViewSet(ListCreateDelViewSet):
     permission_classes = (C_AuthUser_DL_Owner_Permisson,)
-    # queryset = Follow.objects.all()
     serializer_class = SubscriptionSerializer
 
     def get_queryset(self):

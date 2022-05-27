@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from api.mixins import ListCreateViewSet
+from foods.mixins import ListCreateViewSet
 from users.permissions import UserListCreatePermission
 from users.serializers import UserSerializerCreate, UserSerializerList
 
