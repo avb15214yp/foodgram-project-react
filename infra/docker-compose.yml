@@ -9,10 +9,10 @@ services:
     env_file:
       - ./.env
   backend:
-    # image: avb15214/backend
-    build:
-      context: ../backend/foodgram
-      dockerfile: Dockerfile
+    image: avb15214/backend
+    # build:
+    #   context: ../backend/foodgram
+    #   dockerfile: Dockerfile
     restart: always
     volumes:
       - static_value:/app/foodgram/static/
@@ -22,11 +22,13 @@ services:
     env_file:
       - ./.env
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: avb15214/frontend
+    # build:
+    #   context: ../frontend
+    #   dockerfile: Dockerfile
     volumes:
       - result_build:/app/result_build/build/
+      - static_value:/app/result_build/build/static/
   nginx:
     image: nginx:1.19.3
     ports:

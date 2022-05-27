@@ -40,14 +40,28 @@ PAGE_SIZE=6 #Количество записей при пагинации
 ```
 infra$docker-compose up -d --build
 
-infra$docker-compose exec foodgram_backend python manage.py migrate
-infra$docker-compose exec foodgram_backend python manage.py createsuperuser
-infra$docker-compose exec foodgram_backend python manage.py collectstatic --no-input 
+infra$docker-compose exec backend python manage.py migrate
+infra$docker-compose exec backend python manage.py createsuperuser
+infra$docker-compose exec backend python manage.py collectstatic --no-input 
 ```
-### Как заполнить базу данных ингредиентами
+### Как заполнить базу данных 
+
+## ингредиентами
 ```
-docker-compose exec foodgram_backend python manage.py load_ingredients  ../../data/ingredients.csv
+docker-compose exec backend python manage.py load_ingredients ingredients.csv
 ```
+## тегами
+
+```
+через админ панель http://avb15214.ddns.net/admin/
+значениями: 
+Завтрак #00ff00 breakfast 
+Обед #0000ff dinner 
+Ужин #ff0000 lunch 
+
+```
+
+##
 
 Разработчики:
 
