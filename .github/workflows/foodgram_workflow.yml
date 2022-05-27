@@ -37,9 +37,9 @@ jobs:
         passphrase: ${{ secrets.PASSPHRASE }}
         script: |
           whoami
-          sudo docker compose stop
-          sudo docker compose rm web
-          sudo docker image rm avb15214/foodgram:latest
+          # sudo docker compose stop
+          # sudo docker compose rm web
+          # sudo docker image rm avb15214/foodgram:latest
           touch .env
           echo DB_ENGINE=${{ secrets.DB_ENGINE}} >> .env
           echo DB_NAME=${{ secrets.DB_NAME }} >> .env
