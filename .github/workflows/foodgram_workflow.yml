@@ -20,8 +20,8 @@ jobs:
       - name: Push to Docker Hub
         uses: docker/build-push-action@v2 
         with:
-          context: .
-          file: Dockerfile
+          context: backend/foodgram/.
+          file: backend/foodgram/Dockerfile
           push: true
           tags: avb15214/foodgram:latest
   deploy:
