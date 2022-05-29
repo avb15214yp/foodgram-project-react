@@ -38,9 +38,10 @@ jobs:
         script: |
           whoami
           sudo docker compose stop
-          sudo docker compose rm web
+          sudo docker compose rm foodgram
           sudo docker image rm avb15214/foodgram:latest
           cd infra
+          rm .env -f
           touch .env
           echo DB_ENGINE=${{ secrets.DB_ENGINE}} >> .env
           echo DB_NAME=${{ secrets.DB_NAME }} >> .env
