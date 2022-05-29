@@ -40,9 +40,9 @@ PAGE_SIZE=6 #Количество записей при пагинации
 ```
 infra$docker-compose up -d --build
 
-infra$docker-compose exec foodgram python manage.py migrate
-infra$docker-compose exec foodgram python manage.py createsuperuser
-infra$docker-compose exec foodgram python manage.py collectstatic --no-input 
+infra$docker-compose exec backend python manage.py migrate
+infra$docker-compose exec backend python manage.py createsuperuser
+infra$docker-compose exec backend python manage.py collectstatic --no-input 
 ```
 ### Как заполнить базу данных 
 

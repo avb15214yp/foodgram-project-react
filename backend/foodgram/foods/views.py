@@ -108,7 +108,7 @@ class RecipeViewSet(ListAllViewSet):
         ).annotate(Sum('amount')):
             shopping = (
                 shopping + str(cur_record[0]) + ' '
-                + str(cur_record[1]) + str(cur_record[2]) + '\n'
+                + str(cur_record[2]) + str(cur_record[1]) + '\n'
             )
 
         filename = "shopping_list.txt"
