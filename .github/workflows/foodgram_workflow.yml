@@ -38,7 +38,7 @@ jobs:
         script: |
           whoami
           sudo docker compose stop
-          sudo docker compose rm foodgram
+          sudo docker compose rm backend
           sudo docker image rm avb15214/foodgram:latest
           cd infra
           rm .env -f
