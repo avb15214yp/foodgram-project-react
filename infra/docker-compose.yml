@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
   backend:
-    image: avb15214/backend
+    image: avb15214/foodgram
     # build:
     #   context: ../backend/foodgram
     #   dockerfile: Dockerfile
