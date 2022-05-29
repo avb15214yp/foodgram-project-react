@@ -13,12 +13,12 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author', 'user_faworites_count')
+    list_display = ('id', 'name', 'author', 'user_favorites_count')
     search_fields = ('author__username', 'name')
     list_filter = ('tags',)
 
-    def user_faworites_count(self, obj):
-        return obj.user_faworites.count()
+    def user_favorites_count(self, obj):
+        return obj.user_favorites.count()
 
 
 class RecipeIngredientAdmin(admin.ModelAdmin):

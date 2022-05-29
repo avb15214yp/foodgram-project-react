@@ -1,7 +1,7 @@
 from rest_framework import permissions
 
 
-class C_AuthUser_UD_Owner_R_Any_Permisson(permissions.BasePermission):
+class CAuthUserUDOwnerRAnyPermisson(permissions.BasePermission):
 
     def __init__(self, field_owner_name='author'):
         self.field_owner_name = field_owner_name
@@ -17,7 +17,7 @@ class C_AuthUser_UD_Owner_R_Any_Permisson(permissions.BasePermission):
         return getattr(obj, self.field_owner_name) == request.user
 
 
-class C_AuthUser_DL_Owner_Permisson(permissions.BasePermission):
+class CAuthUserDLOwnerPermisson(permissions.BasePermission):
 
     def __init__(self, field_owner_name='author'):
         self.field_owner_name = field_owner_name

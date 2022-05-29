@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 ROLE_USER = 'user'
 ROLE_ADMIN = 'admin'
@@ -13,12 +12,12 @@ ROLES = [
 
 class CustomUserManager(UserManager):
 
-    def create_user(self, username, email, password,  **extra_fields):
+    def create_user(self, username, email, password, **extra_fields):
         if not email:
             raise ValueError('Email is required')
-        if not extra_fields.get('first_name', None):
+        if not extra_fields.get('first_name'):
             raise ValueError('First name is required')
-        if not extra_fields.get('last_name', None):
+        if not extra_fields.get('last_name'):
             raise ValueError('Last name is required')
         if username == 'me':
             raise ValueError('"me" is invalid username')
@@ -33,15 +32,13 @@ class CustomUserManager(UserManager):
 
 class User(AbstractUser):
 
-    email = models.EmailField(_("email address"), unique=True, db_index=True)
-    first_name = models.CharField(_("first name"), max_length=150, blank=False)
-    last_name = models.CharField(_("last name"), max_length=150, blank=False)
+    email = models.EmailField("email адрес", unique=True, db_index=True)
+    first_name = models.CharField("Имя", max_length=150)
+    last_name = models.CharField("Фамилия", max_length=150)
 
     role = models.CharField(
         choices=ROLES,
         default=ROLE_USER,
-        blank=False,
-        null=False,
         max_length=200,
         verbose_name='Роль',
     )

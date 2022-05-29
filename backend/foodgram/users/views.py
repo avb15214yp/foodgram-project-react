@@ -35,6 +35,8 @@ class UserListCreateViewSet(ListCreateViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        self.request.user.set_password(serializer.data["new_password"])
+        self.request.user.set_password(
+            serializer.validated_data["new_password"]
+        )
         self.request.user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)

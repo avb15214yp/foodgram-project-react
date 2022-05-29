@@ -16,7 +16,7 @@ class UserSerializerList(serializers.HyperlinkedModelSerializer):
         ]
 
     def get_is_subscribed(self, obj):
-        request = self.context.get('request', None)
+        request = self.context.get('request')
         if not request:
             return False
         user = request.user

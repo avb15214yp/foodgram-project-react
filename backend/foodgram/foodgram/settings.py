@@ -21,14 +21,14 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',    
+    'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
     'django_filters',
     'rest_framework.authtoken',
     'djoser',
     'users.apps.UsersConfig',
-    'foods.apps.FoodsConfig',    
+    'foods.apps.FoodsConfig',
 
 ]
 
@@ -115,7 +115,7 @@ AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly', 
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
 
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -127,17 +127,17 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-   'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-   'AUTH_HEADER_TYPES': ('Token',),
-} 
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Token',),
+}
 
 DJOSER = {
-    'PERMISSIONS' : {
+    'PERMISSIONS': {
         'activation': ['rest_framework.permissions.IsAdminUser'],
         'user_list': ['rest_framework.permissions.IsAdminUser'],
     },
-    'HIDE_USERS' : True,
-    'LOGIN_FIELD' : 'email',
+    'HIDE_USERS': True,
+    'LOGIN_FIELD': 'email',
 }
 
 CORS_ORIGIN_ALLOW_ALL = True

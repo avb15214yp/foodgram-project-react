@@ -1,16 +1,15 @@
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
 
 
 class Unit(models.Model):
     name = models.CharField(
-        _('name'), max_length=200,
-        blank=False, null=False, unique=True
-        )
+        'Имя', max_length=200,
+        unique=True
+    )
 
     class Meta:
         ordering = ['name', ]
@@ -23,19 +22,18 @@ class Unit(models.Model):
 
 class Ingredient(models.Model):
     name = models.CharField(
-        _('name'), max_length=200,
-        blank=False, null=False, unique=True
+        'Имя', max_length=200,
+        unique=True
     )
     measurement_unit = models.ForeignKey(
         Unit, on_delete=models.PROTECT,
-        blank=False, null=False,
         verbose_name='ед. изм'
     )
 
     class Meta:
         ordering = ['name', ]
-        verbose_name = _('ингредиент')
-        verbose_name_plural = _('ингредиенты')
+        verbose_name = 'ингредиент'
+        verbose_name_plural = 'ингредиенты'
 
     def __str__(self):
         return self.name
@@ -43,19 +41,19 @@ class Ingredient(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(
-        _('name'), max_length=200,
-        blank=False, null=False, unique=True
+        'Имя', max_length=200,
+        unique=True
     )
     color = models.CharField(
-        _("цвет"), max_length=7,
+        "Имя", max_length=7,
         blank=True, null=True
     )
     slug = models.SlugField(max_length=200, unique=True, blank=True, null=True)
 
     class Meta:
         ordering = ['name', ]
-        verbose_name = _('тег')
-        verbose_name_plural = _('теги')
+        verbose_name = 'тег'
+        verbose_name_plural = 'теги'
 
     def __str__(self):
         return self.name
@@ -71,8 +69,8 @@ class Recipe(models.Model):
 
     tags = models.ManyToManyField(Tag, verbose_name='Тэг')
 
-    user_faworites = models.ManyToManyField(
-        User, related_name='recipe_faworites',
+    user_favorites = models.ManyToManyField(
+        User, related_name='recipe_favorites',
         verbose_name='фаворит у пользователей',
         blank=True
     )
@@ -83,30 +81,24 @@ class Recipe(models.Model):
         blank=True
     )
 
-    image = models.ImageField(
-        _('Картинка'), upload_to='recipes/',
-        blank=False
-        )
+    image = models.ImageField('Картинка', upload_to='recipes/')
 
     name = models.CharField(
-        _('name'), max_length=200,
-        blank=False, null=False, unique=True
+        'Имя', max_length=200,
+        unique=True
     )
 
     text = models.TextField(
-        _('Описание'),
-        blank=False, null=False,
+        'Описание',
     )
 
     cooking_time = models.IntegerField(
-        _('Время приготовления (в минутах)'),
+        'Время приготовления (в минутах)',
         validators=[MinValueValidator(1)],
-        blank=False, null=False
     )
 
     author = models.ForeignKey(
         User, on_delete=models.PROTECT,
-        blank=False, null=False,
         verbose_name='Автор', related_name='recipe_author'
     )
 
@@ -122,16 +114,13 @@ class Recipe(models.Model):
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe, on_delete=models.CASCADE,
-        blank=False, null=False,
         related_name='recipe_ingredient'
     )
     ingredient = models.ForeignKey(
         Ingredient, on_delete=models.CASCADE,
-        blank=False, null=False
     )
     amount = models.IntegerField(
-        _('Количество'), validators=[MinValueValidator(1)],
-        blank=False, null=False
+        'Количество', validators=[MinValueValidator(1)],
     )
 
     class Meta:
