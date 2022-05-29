@@ -35,8 +35,6 @@ jobs:
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
-        source: "infra/docker-compose.yml"
-        target: "infra/docker-compose.yml"
         script: |
           whoami
           # sudo docker compose stop
