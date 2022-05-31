@@ -27,6 +27,13 @@ class BaseModelSerializer(serializers.ModelSerializer):
         else:
             return None
 
+    def get_errors(self):
+        errors = list()
+        for err_det in self.errors.values():
+            for err in err_det:
+                errors.append(err.title())
+        return errors
+
 
 class UnitSerializer(serializers.ModelSerializer):
 
@@ -63,8 +70,15 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'color', 'slug']
         read_only_fields = ['name', 'color', 'slug']
 
-    def to_internal_value(self, data):
-        return {'id': data}
+
+class TagCreateSerializer(serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(), many=True
+    )
+
+    class Meta:
+        model = Tag
+        fields = ['id']
 
 
 class RecipeSerializerForFavorite(serializers.ModelSerializer):
@@ -102,31 +116,21 @@ class RecipeSerializer(BaseModelSerializer):
             'cooking_time'
         ]
 
-    def validate_tags(self, value):
-        value = validate_array_duplicates(
-            value, 'Переданы повторяющиеся теги')
-        for i in range(len(value)):
-            pk = value[i]['id']
-            try:
-                tag = Tag.objects.get(pk=pk)
-            except Tag.DoesNotExist:
-                raise serializers.ValidationError(f'Не найден Тэг с id={pk}')
-            value[i] = tag
-        return value
-
     def validate_ingredients(self, value):
         value = validate_array_duplicates(
             value, 'Переданы повторяющиеся ингредиенты')
-        for i in range(len(value)):
-            pk = value[i]['ingredient']['id']
+        ret = list()
+        for el in value:
+            pk = el['ingredient']['id']
             try:
                 ingredient = Ingredient.objects.get(pk=pk)
             except Ingredient.DoesNotExist:
                 raise serializers.ValidationError(
                     f'Не найден ингредиент с id={pk}'
                 )
-            value[i]['ingredient'] = ingredient
-        return value
+            el['ingredient'] = ingredient
+            ret.append(el)
+        return ret
 
     def get_is_favorited(self, obj):
         user = self.get_authenticated_user()
@@ -176,18 +180,48 @@ class RecipeSerializer(BaseModelSerializer):
         return instance
 
 
-class SubscriptionSerializer(BaseModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), source='following', write_only=True
+class RecipeCreateSerializer(RecipeSerializer):
+    tags = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Tag.objects.all()
     )
-    user = serializers.PrimaryKeyRelatedField(
+
+    def validate_tags(self, value):
+        value = validate_array_duplicates(
+            value, 'Переданы повторяющиеся теги')
+        return value
+
+
+class SubscriptionListSerializer(UserSerializerList):
+    recipes = RecipeShortSerializer(
+        source='recipe_author', many=True
+    )
+    recipes_count = serializers.SerializerMethodField()
+
+    class Meta(UserSerializerList.Meta):
+        fields = [
+            'email', 'id', 'username', 'first_name',
+            'last_name', 'is_subscribed', 'recipes',
+            'recipes_count',
+        ]
+        read_only_fields = [
+            'email', 'username', 'first_name',
+            'last_name', 'is_subscribed', 'recipes',
+            'recipes_count',
+        ]
+
+    def get_recipes_count(self, obj):
+        return obj.recipe_author.count()
+
+
+class SubscriptionSerializer(BaseModelSerializer):
+    following = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(),
     )
 
     class Meta:
         model = Follow
-        fields = '__all__'
-        read_only_fields = ['following', 'user']
+        fields = ['user', 'following']
         validators = [
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
@@ -195,27 +229,6 @@ class SubscriptionSerializer(BaseModelSerializer):
                 message='Уже существует подписка на этого автора'
             )
         ]
-
-    def to_representation(self, value):
-        request = self.context['request']
-        recipes_limit = request.query_params.get('recipes_limit')
-        context = {'context': self.context}
-        ret = UserSerializerList(
-            value.following, **context
-        ).data
-        author_id = ret['id']
-        if recipes_limit:
-            recipe_set = Recipe.objects.filter(
-                author__id=author_id
-            )[:int(recipes_limit)]
-        else:
-            recipe_set = Recipe.objects.filter(author__id=author_id)
-        recipes = RecipeShortSerializer(
-            recipe_set, many=True, **context
-        ).data
-        ret.update({'recipes': recipes})
-        ret.update({'recipes_count': len(recipes)})
-        return ret
 
     def validate(self, data):
         super().validate(data)

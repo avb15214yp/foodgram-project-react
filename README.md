@@ -53,7 +53,7 @@ docker-compose exec backend python manage.py load_ingredients ingredients.csv
 ## тегами
 
 ```
-через админ панель http://avb15214.ddns.net/admin/
+через админ панель http://51.250.22.28/admin/
 значениями: 
 Завтрак #00ff00 breakfast 
 Обед #0000ff dinner 

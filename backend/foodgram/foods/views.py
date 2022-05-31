@@ -11,9 +11,10 @@ from foods.mixins import ListAllViewSet, ListCreateDelViewSet, ListViewSet
 from foods.models import Ingredient, Recipe, RecipeIngredient, Tag
 from foods.permissions import (CAuthUserDLOwnerPermisson,
                                CAuthUserUDOwnerRAnyPermisson)
-from foods.serializers import (IngredientSerializer, RecipeSerializer,
-                               RecipeSerializerForFavorite,
+from foods.serializers import (IngredientSerializer, RecipeCreateSerializer,
+                               RecipeSerializer, RecipeSerializerForFavorite,
                                SubscriptionDeleteSerializer,
+                               SubscriptionListSerializer,
                                SubscriptionSerializer, TagSerializer)
 from foods.shortcuts import get_object_or_response400
 from users.models import Follow
@@ -40,11 +41,15 @@ class TagViewSet(ListViewSet):
 class RecipeViewSet(ListAllViewSet):
     permission_classes = (CAuthUserUDOwnerRAnyPermisson,)
     queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
-    def _m2m_get_post_delete(
+    def get_serializer_class(self):
+        if self.action in ('create', 'partial_update'):
+            return RecipeCreateSerializer
+        return RecipeSerializer
+
+    def _m2m_post_delete(
         self, request,
         m2m, pk=None,
         error_msg_exists='',
@@ -81,7 +86,7 @@ class RecipeViewSet(ListAllViewSet):
     def favorite(self, request, pk=None):
         user = request.user
         m2m = user.recipe_favorites
-        return self._m2m_get_post_delete(
+        return self._m2m_post_delete(
             request, m2m, pk=pk,
             error_msg_exists='Этот рецепт уже добавлен в избранные',
             error_msg_not_exists='Этого рецепта нет в избранных'
@@ -91,7 +96,7 @@ class RecipeViewSet(ListAllViewSet):
     def shopping_cart(self, request, pk=None):
         user = request.user
         m2m = user.recipe_shopping
-        return self._m2m_get_post_delete(
+        return self._m2m_post_delete(
             request, m2m, pk=pk,
             error_msg_exists='Этот рецепт уже добавлен в покупки',
             error_msg_not_exists='Этого рецепта нет в списке покупок'
@@ -122,53 +127,46 @@ class RecipeViewSet(ListAllViewSet):
 
 class SubscriptionViewSet(ListCreateDelViewSet):
     permission_classes = (CAuthUserDLOwnerPermisson,)
-    serializer_class = SubscriptionSerializer
+    serializer_class = SubscriptionListSerializer
 
     def get_queryset(self):
         user = self.request.user
-        return Follow.objects.filter(user=user)
+        return User.objects.filter(following__user=user)
+
+    def get_context(self, request):
+        return {'context': {'request': request, 'action': self.action}}
 
     def create(self, request, id):
-        res, is_valid = self._get_validated_data(request, id)
-        if not is_valid:
-            return res
-        validated_data = res
-        context = {'context': {'request': request, 'action': self.action}}
-        follow = Follow.objects.create(**validated_data)
-        data = SubscriptionSerializer(instance=follow, **context).data
+        res_data, res = self._get_validated_data(request, id, self.action)
+        if not res:
+            return res_data
+        follow = Follow.objects.create(**res_data)
+        data = SubscriptionListSerializer(
+            instance=follow.following,).data
         return Response(data=data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, id):
-        res, is_valid = self._get_validated_data(request, id)
-        if not is_valid:
-            return res
-        follow = res
+        res_data, res = self._get_validated_data(request, id, self.action)
+        if not res:
+            return res_data
+        follow = res_data
         follow.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def _get_validated_data(self, request, id):
-        user = request.user
-        context = {'context': {'request': request, 'action': self.action}}
-        if self.action == 'delete':
-            serializer = SubscriptionDeleteSerializer
-        else:
+    def _get_validated_data(self, request, id, action):
+        context = self.get_context(request)
+        if action == 'create':
             serializer = SubscriptionSerializer
-
+        else:
+            serializer = SubscriptionDeleteSerializer
         serializer = serializer(
-            data={'id': id, 'user': user.id}, **context
+            data={'following': id, 'user': request.user.id},
+            **context
         )
-
         if not serializer.is_valid():
-            errors = list()
-            for err_det in serializer.errors.values():
-                for err in err_det:
-                    errors.append(err.title())
-
-            return (
-                Response(
-                    status=status.HTTP_400_BAD_REQUEST,
-                    data={'errors': errors, }
-                ),
-                False
-            )
-        return (serializer.validated_data, True)
+            errors = serializer.get_errors()
+            return (Response(status=status.HTTP_400_BAD_REQUEST,
+                             data={'errors': errors, }),
+                    False
+                    )
+        return serializer.validated_data, True
