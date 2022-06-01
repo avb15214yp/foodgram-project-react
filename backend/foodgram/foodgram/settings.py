@@ -10,7 +10,7 @@ load_dotenv()
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='django-insecure-expwsgh^8rnl)lms7osg*&bs_1qwpzo$l)b&cqj=1edl#rpp&r')
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
