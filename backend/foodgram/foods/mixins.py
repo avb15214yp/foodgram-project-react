@@ -5,6 +5,7 @@ from rest_framework.pagination import LimitOffsetPagination
 class ListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
     pagination_class = LimitOffsetPagination
+    pagination_class.offset_query_param = 'page'
 
 
 class ListCreateViewSet(mixins.CreateModelMixin,
