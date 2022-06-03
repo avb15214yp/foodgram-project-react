@@ -19,6 +19,10 @@ postgres
 Описание в проекте: http://51.250.22.28/api/docs/
 Основная страница: http://51.250.22.28
 Доступ в админ. панель: http://51.250.22.28/admin/
+admin
+admin
+
+Доступ на сайт
 admin@ya.ru
 admin
 ```
@@ -57,7 +61,7 @@ docker-compose exec backend python manage.py load_ingredients ingredients.csv
 
 ```
 через админ панель http://51.250.22.28/admin/
-admin@ya.ru
+admin
 admin
 значениями: 
 Завтрак #00ff00 breakfast 
