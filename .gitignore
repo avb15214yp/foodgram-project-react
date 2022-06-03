@@ -135,3 +135,4 @@ data/
 media/
 .vscode
 backend/foodgram/media/.
+data/.

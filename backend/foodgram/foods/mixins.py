@@ -1,11 +1,11 @@
 from rest_framework import mixins, viewsets
-from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.pagination import PageNumberPagination
 
 
 class ListViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
-    pagination_class = LimitOffsetPagination
-    pagination_class.offset_query_param = 'page'
+    pagination_class = PageNumberPagination
+    pagination_class.page_size_query_param = 'limit'
 
 
 class ListCreateViewSet(mixins.CreateModelMixin,

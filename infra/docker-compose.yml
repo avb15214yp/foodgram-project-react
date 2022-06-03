@@ -9,10 +9,7 @@ services:
     env_file:
       - .env
   backend:
-    image: avb15214/foodgram
-    # build:
-    #   context: ../backend/foodgram
-    #   dockerfile: Dockerfile
+    image: avb15214/foodgram    
     restart: always
     volumes:
       - static_value:/app/foodgram/static/
@@ -22,10 +19,7 @@ services:
     env_file:
       - .env
   frontend:
-    image: avb15214/frontend
-    # build:
-    #   context: ../frontend
-    #   dockerfile: Dockerfile
+    image: avb15214/frontend    
     volumes:
       - result_build:/app/result_build/build/
       - static_value:/app/result_build/build/static/
